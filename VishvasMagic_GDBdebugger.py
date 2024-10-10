@@ -1,6 +1,10 @@
 #import the GDB
 import gdb
 
+from pygments import highlight
+from pygments.lexers import CLexer
+from pygments.formatters import TerminalFormatter
+
 def run_program():
     """
     Runs the program being debugged.
@@ -23,6 +27,7 @@ def display_layout():
     print("Switching to TUI layout...")
     gdb.execute("layout src")
     gdb.execute("set print pretty on")
+    gdb.execute("tui disable")    
     gdb.execute("tui enable")
 
 def set_breakpoint(bp_loc):
@@ -58,6 +63,24 @@ class ThreadInfoCommand(gdb.Command):
 
         print("-" * 50)
 
+
+class PrettyList(gdb.Command):
+    """Print source code with color."""
+    def __init__(self):
+        super(PrettyList, self).__init__("preety_list", gdb.COMMAND_USER)
+        self.lex = CLexer()
+        self.fmt = TerminalFormatter()
+
+    def invoke(self, args, tty):
+        try:
+            # Capture the source code from the 'list' command
+            out = gdb.execute(f"list {args}", to_string=True)
+            # Highlight the output using Pygments
+            print(highlight(out, self.lex, self.fmt))
+        except Exception as e:
+            print(f"Error: {e}")
+
+
 def main():
     """
     Main script execution - runs the program, stops it, and displays layout.
@@ -71,11 +94,17 @@ def main():
     
 
     # Switch to TUI layout after stopping the program.
-    display_layout()
+   
+    PrettyList()
+    ThreadInfoCommand()
 
     set_breakpoint("main")
     run_program()
-    ThreadInfoCommand()
+    
+    
+    gdb.execute("break DiscoverARS548RefRadar")
+
+    display_layout() # Call this last or GDB is screw up 
 
 # Execute the main function when the script is sourced in GDB.
 main()
