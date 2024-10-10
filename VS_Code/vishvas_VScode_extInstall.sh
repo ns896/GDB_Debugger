@@ -1,6 +1,9 @@
 #!/bin/bash
 # Install all extensions from the extensions.txt file
 
+#code to extract the installed packes to a txt file 
+#code --list-extensions > extensions.txt
+
 while read -r vs_CodeExtensions; do
   code --install-extension "$extension"
 done <  vs_CodeExtensions.txt
