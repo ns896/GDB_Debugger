@@ -1,39 +1,22 @@
 #import the GDB
 import gdb
-
 from pygments import highlight
 from pygments.lexers import CLexer
 from pygments.formatters import TerminalFormatter
 
+# Setting debug in GDB
 def run_program():
-    """
-    Runs the program being debugged.
-    """
-    print("Running the program...")
-    gdb.execute("run")
+	print("Running the program...")
+	gdb.execute("run")
 
 def stop_program():
-    """
-    Stops the program being debugged (e.g., when it's running).
-    This can be done by interrupting the process, similar to Ctrl+C.
-    """
-    print("Stopping the program...")
-    gdb.execute("interrupt")
+	print("Stopping the program...")
+	gdb.execute("interrupt")
 
-def display_layout():
-    """
-    Switches to the TUI (Text User Interface) layout in GDB.
-    """
-    print("Switching to TUI layout...")
-    gdb.execute("layout src")
-    gdb.execute("set print pretty on")
-    gdb.execute("tui disable")    
-    gdb.execute("tui enable")
 
 def set_breakpoint(bp_loc):
-    print("setting Break Point")
+    print("Setting Break Point")
     gdb.execute(f"break {bp_loc}") 
-
 
 class ThreadInfoCommand(gdb.Command):
     """Custom command to print thread information nicely."""
@@ -44,7 +27,6 @@ class ThreadInfoCommand(gdb.Command):
     def invoke(self, arg, from_tui):
         # Get the list of threads
         threads = gdb.execute("info threads", to_string=True)
-        # Split the output into lines
         thread_lines = threads.splitlines()
 
         print("\n" + " " * 2 + "ID    Target ID                 Frame")
@@ -63,11 +45,11 @@ class ThreadInfoCommand(gdb.Command):
 
         print("-" * 50)
 
-
 class PrettyList(gdb.Command):
     """Print source code with color."""
+    
     def __init__(self):
-        super(PrettyList, self).__init__("preety_list", gdb.COMMAND_USER)
+        super(PrettyList, self).__init__("pretty_list", gdb.COMMAND_USER)
         self.lex = CLexer()
         self.fmt = TerminalFormatter()
 
@@ -80,31 +62,33 @@ class PrettyList(gdb.Command):
         except Exception as e:
             print(f"Error: {e}")
 
+class KrvLayout(gdb.Command):
+	def __init__(self):
+		super(KrvLayout, self).__init__("KrvLayout", gdb.COMMAND_USER)
+		self.lex = CLexer()
+		self.fmt = TerminalFormatter()
+
+	def invoke(self, args, tty):
+		try:
+			# Capture the source code from the 'list' command
+			gdb.execute("tui enable")  # Changed to capture source code
+			# Highlight the output using Pygments
+			#print(highlight(out, self.lex, self.fmt))
+		except Exception as e:
+			print(f"Error: {e}")
 
 def main():
-    """
-    Main script execution - runs the program, stops it, and displays layout.
-    """
-    # run_program()
-    
-    # Pause for demonstration purposes (e.g., wait for the program to start).
-    # gdb.execute("shell sleep 2")
-    # stop_program()
-    
-    
-
-    # Switch to TUI layout after stopping the program.
-   
-    PrettyList()
-    ThreadInfoCommand()
-
-    set_breakpoint("main")
-    run_program()
-    
-    
-    gdb.execute("break DiscoverARS548RefRadar")
-
-    display_layout() # Call this last or GDB is screw up 
-
-# Execute the main function when the script is sourced in GDB.
-main()
+	"""Main script execution - runs the program, stops it, and displays layout."""
+	
+	PrettyList()
+	ThreadInfoCommand()
+	KrvLayout()
+	
+	gdb.execute("break ref_radar_service.cc:11")
+	gdb.execute("break ref_radar_service.cc:5")
+	
+	gdb.execute("run")
+	
+# Call the main function to execute
+if __name__ == "__main__":
+    main()
