@@ -80,6 +80,8 @@ class KrvLayout(gdb.Command):
 def main():
 	"""Main script execution - runs the program, stops it, and displays layout."""
 	
+
+	
 	PrettyList()
 	ThreadInfoCommand()
 	KrvLayout()
