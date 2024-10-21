@@ -88,7 +88,7 @@ def main():
 	
 	gdb.execute("break ref_radar_service.cc:11")
 	gdb.execute("break ref_radar_service.cc:5")
-	
+	gdb.breakpoints()
 	gdb.execute("run")
 	
 # Call the main function to execute
