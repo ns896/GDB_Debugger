@@ -72,7 +72,8 @@ class KrvLayout(gdb.Command):
 		try:
 			# Capture the source code from the 'list' command
 			gdb.execute("tui enable")  # Changed to capture source code
-			# Highlight the output using Pygments
+			gdb.execute("set print pretty on")
+            # Highlight the output using Pygments
 			#print(highlight(out, self.lex, self.fmt))
 		except Exception as e:
 			print(f"Error: {e}")
@@ -86,8 +87,8 @@ def main():
 	ThreadInfoCommand()
 	KrvLayout()
 	
-	gdb.execute("break ref_radar_service.cc:11")
-	gdb.execute("break ref_radar_service.cc:5")
+	gdb.execute("break ref_radar_service.cc:13")
+	gdb.execute("break ref_radar_service.cc:16")
 	gdb.breakpoints()
 	gdb.execute("run")
 	
