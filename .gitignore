@@ -1,0 +1,3 @@
+# Or ignore all .log files (if that's your preferred extension for log files)
+*.log
+
